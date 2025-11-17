@@ -1,0 +1,52 @@
+name: Android Release APK
+
+on:
+  workflow_dispatch:
+
+  jobs:
+    build:
+        runs-on: ubuntu-latest
+
+            steps:
+                  - name: Checkout code
+                          uses: actions/checkout@v3
+
+                                - name: Set up Node.js
+                                        uses: actions/setup-node@v3
+                                                with:
+                                                          node-version: 18
+
+                                                                - name: Install dependencies
+                                                                        run: npm install
+
+                                                                              - name: Build web app
+                                                                                      run: npm run build
+
+                                                                                            - name: Copy web build into android
+                                                                                                    run: npx cap sync android
+
+                                                                                                          - name: Decode keystore
+                                                                                                                  run: echo "$KEYSTORE_FILE" | base64 --decode > android/release-keystore.jks
+                                                                                                                          env:
+                                                                                                                                    KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+
+                                                                                                                                          - name: Set up JDK
+                                                                                                                                                  uses: actions/setup-java@v3
+                                                                                                                                                          with:
+                                                                                                                                                                    distribution: temurin
+                                                                                                                                                                              java-version: 17
+
+                                                                                                                                                                                    - name: Build signed APK
+                                                                                                                                                                                            working-directory: android
+                                                                                                                                                                                                    run: ./gradlew assembleRelease
+
+                                                                                                                                                                                                            env:
+                                                                                                                                                                                                                      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+                                                                                                                                                                                                                                KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+                                                                                                                                                                                                                                          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+                                                                                                                                                                                                                                                - name: Upload APK
+                                                                                                                                                                                                                                                        uses: actions/upload-artifact@v3
+                                                                                                                                                                                                                                                                with:
+                                                                                                                                                                                                                                                                          name: Solo-release-apk
+                                                                                                                                                                                                                                                                                    path: android/app/build/outputs/apk/release/app-release.apk
