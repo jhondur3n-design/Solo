@@ -1,0 +1,7 @@
+{
+  "name": "Solo Leveller 1.0",
+  "description": "Solo Leveller 1.0 is a fictional metaphysical simulation inspired by Solo Leveling. This application simulates various energetic and spiritual tools with a glowing blue, futuristic UI. All features are symbolic UI simulations only and are designed for offline use.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

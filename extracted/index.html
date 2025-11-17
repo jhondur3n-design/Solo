@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solo Leveller 1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes neon-glow {
+            0%, 100% { text-shadow: 0 0 5px #00eaff, 0 0 10px #00eaff, 0 0 20px #00eaff, 0 0 40px #00a0ff, 0 0 80px #00a0ff; }
+            50% { text-shadow: 0 0 2px #00eaff, 0 0 5px #00eaff, 0 0 10px #00a0ff, 0 0 20px #00a0ff, 0 0 40px #00a0ff; }
+        }
+        @keyframes pulse-aura {
+            0% { box-shadow: 0 0 0px rgba(0, 200, 255, 0.7); }
+            50% { box-shadow: 0 0 15px rgba(0, 200, 255, 0.9), 0 0 30px rgba(0, 150, 255, 0.5); }
+            100% { box-shadow: 0 0 0px rgba(0, 200, 255, 0.7); }
+        }
+        @keyframes scan-line {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-5px, -5px); }
+            100% { transform: translate(0, 0); }
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes spin-fast {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+        @keyframes fade-in-out {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.2; }
+        }
+        @keyframes ping {
+            75%, 100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        @keyframes particle-flow {
+          0% { transform: translate(0, 0) scale(0); opacity: 0; }
+          25% { transform: translate(var(--dx1, 10px), var(--dy1, -10px)) scale(1); opacity: 0.7; }
+          50% { transform: translate(var(--dx2, -10px), var(--dy2, 10px)) scale(0.5); opacity: 0.4; }
+          75% { transform: translate(var(--dx3, 10px), var(--dy3, 5px)) scale(1.2); opacity: 0.9; }
+          100% { transform: translate(var(--dx4, 0), var(--dy4, 0)) scale(0); opacity: 0; }
+        }
+
+        .solo-leveling-gradient {
+            background: radial-gradient(circle at center, rgba(0, 200, 255, 0.1) 0%, rgba(0, 50, 100, 0.5) 50%, rgba(0, 0, 0, 0.8) 100%);
+        }
+        .neon-text {
+            animation: neon-glow 1.5s ease-in-out infinite alternate;
+            will-change: text-shadow;
+        }
+        .aura-effect {
+            animation: pulse-aura 3s infinite ease-in-out;
+            will-change: box-shadow;
+        }
+        .scan-line-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgba(0, 255, 255, 0.7), transparent);
+            animation: scan-line 3s infinite linear;
+            pointer-events: none;
+            will-change: transform;
+        }
+        .animate-pulse-slow { animation: pulse-slow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; will-change: opacity; }
+        .animate-pulse-fast { animation: pulse-fast 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; will-change: opacity; }
+        .animate-spin-slow { animation: spin-slow 10s linear infinite; will-change: transform; }
+        .animate-spin-fast { animation: spin-fast 5s linear infinite; will-change: transform; }
+        .animate-fade-in-out { animation: fade-in-out 3s ease-in-out infinite; will-change: opacity; }
+        .animate-particle-flow { will-change: transform, opacity; }
+        .animate-ping { will-change: transform, opacity; }
+
+
+        /* Custom Scrollbar Styles */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 150, 255, 0.1);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 200, 255, 0.5);
+            border-radius: 10px;
+            border: 2px solid rgba(0, 100, 200, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(0, 255, 255, 0.7);
+        }
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 200, 255, 0.5) rgba(0, 150, 255, 0.1);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-gray-900 text-gray-100 font-mono overflow-hidden h-screen w-screen flex flex-col items-center justify-center">
+    <div id="root" class="relative w-full h-full flex flex-col items-center justify-center solo-leveling-gradient"></div>
+    <script type="module" src="./index.tsx"></script>
+    <script>
+      // Register service worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.ts', { type: 'module' })
+            .then(registration => {
+              console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(error => {
+              console.error('Service Worker registration failed:', error);
+            });
+        });
+      }
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

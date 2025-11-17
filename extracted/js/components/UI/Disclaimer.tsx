@@ -1,0 +1,1 @@
+// This file is removed and replaced by WelcomeModal.tsx
