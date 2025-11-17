@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">solo</string>
+    <string name="title_activity_main">solo</string>
+    <string name="package_name">com.solo.app</string>
+    <string name="custom_url_scheme">com.solo.app</string>
+</resources>
