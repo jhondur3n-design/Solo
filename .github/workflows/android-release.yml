@@ -1,69 +1,8 @@
-name: Android - Build Signed APK
+name: Build APK
+on: workflow_dispatch
 
-on:
-  workflow_dispatch:
-
-  jobs:
-    build-release-apk:
-        runs-on: ubuntu-latest
-            timeout-minutes: 60
-
-                env:
-                      # these env names reference repo secrets later when Gradle picks them up
-                            KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-                                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-                                        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
-                                            steps:
-                                                  - name: Checkout repository
-                                                          uses: actions/checkout@v4
-                                                                  with:
-                                                                            fetch-depth: 0
-
-                                                                                  - name: Set up Java (required for Gradle)
-                                                                                          uses: actions/setup-java@v3
-                                                                                                  with:
-                                                                                                            distribution: temurin
-                                                                                                                      java-version: '17'
-
-                                                                                                                            - name: Install Android SDK (platforms, build-tools, platform-tools)
-                                                                                                                                    uses: android-actions/setup-android@v2
-                                                                                                                                            with:
-                                                                                                                                                      api-level: 33
-                                                                                                                                                                build-tools: 33.0.2
-                                                                                                                                                                          components: platform-tools,platforms;android-33,build-tools;33.0.2
-                                                                                                                                                                                    cache: true
-
-                                                                                                                                                                                          - name: Ensure Gradle wrapper is executable
-                                                                                                                                                                                                  run: |
-                                                                                                                                                                                                            if [ -f ./gradlew ]; then chmod +x ./gradlew; fi
-                                                                                                                                                                                                                      if [ -f android/gradlew ]; then chmod +x android/gradlew; fi
-
-                                                                                                                                                                                                                            - name: Decode keystore (from secret) -> android/app/release-keystore.jks
-                                                                                                                                                                                                                                    # secrets.KEYSTORE_BASE64 should contain the base64 of your keystore file
-                                                                                                                                                                                                                                            run: |
-                                                                                                                                                                                                                                                      mkdir -p android/app
-                                                                                                                                                                                                                                                                echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release-keystore.jks
-                                                                                                                                                                                                                                                                        shell: bash
-
-                                                                                                                                                                                                                                                                              - name: Show java & sdk paths (debug)
-                                                                                                                                                                                                                                                                                      run: |
-                                                                                                                                                                                                                                                                                                java -version
-                                                                                                                                                                                                                                                                                                          sdkmanager --list || true
-
-                                                                                                                                                                                                                                                                                                                - name: Run Gradle assembleRelease
-                                                                                                                                                                                                                                                                                                                        working-directory: android
-                                                                                                                                                                                                                                                                                                                                run: |
-                                                                                                                                                                                                                                                                                                                                          ./gradlew assembleRelease --no-daemon --stacktrace
-                                                                                                                                                                                                                                                                                                                                                  env:
-                                                                                                                                                                                                                                                                                                                                                            ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
-                                                                                                                                                                                                                                                                                                                                                                      # pass keystore credentials to the Gradle process (in case build.gradle reads env vars)
-                                                                                                                                                                                                                                                                                                                                                                                KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-                                                                                                                                                                                                                                                                                                                                                                                          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-                                                                                                                                                                                                                                                                                                                                                                                                    KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
-                                                                                                                                                                                                                                                                                                                                                                                                          - name: Upload signed APK artifact
-                                                                                                                                                                                                                                                                                                                                                                                                                  uses: actions/upload-artifact@v4
-                                                                                                                                                                                                                                                                                                                                                                                                                          with:
-                                                                                                                                                                                                                                                                                                                                                                                                                                    name: solo-release-apk
-                                                                                                                                                                                                                                                                                                                                                                                                                                              path: android/app/build/outputs/apk/release/app-release.apk
+jobs:
+  build:
+      runs-on: ubuntu-latest
+          steps:
+                - uses: actions/checkout@v4
